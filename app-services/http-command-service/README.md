@@ -1,16 +1,16 @@
-# HTTP Command Service
+# HTTP Command Service #
 
-####Overview
+#### Overview ####
 
 We sometimes want to trigger device actions from the cloud; that is, from the Azure IoT Hub to EdgeX. The EdgeX Core Command Service provides a comprehensive set of APIs to achieve this. However, in some cases, you might prefer not to expose all APIs and therefore require a finer-grained control over the APIs to be exposed. For example, you might want to control the commands on specific devices that can receive commands from outside of EdgeX, or to allow only certain values for a specific command.  HTTP Command Service provides a sample implementations to achieve such control.
 
-####Prerequisites
+#### Prerequisites ####
 
 * Obtain the code from the https://github.com/edgexfoundry-holding/app-service-examples repo
 * Ensure that EdgeX is running with mandatory services, including core services and logging service
 * Ensure that the Virtual Device Service is running and managed by EdgeX with at least one pre-defined device, such as Random-Boolean-Device
 
-####Steps
+#### Steps ####
 
 1. The HTTP Command Service exposes an HTTP service for the client to switch on / off of the device without knowing the underlying EdgeX APIs. For the service to send commands to correct device, you must set DeviceID and CommandID in the res/configuration.toml file. 
    **Note:** For real use cases, the DeviceID must be associated with the actual device that is managed by EdgeX; the CommandID must be associated with the required command registered under the EdgeX Core Command Service, and the command must provide correct responses to consume the [switch on / off JSON document](https://github.com/edgexfoundry-holding/app-service-examples/blob/master/app-services/http-command-service/status-on-request.json). For simplicity, we can use the Virtual Device Service here.
