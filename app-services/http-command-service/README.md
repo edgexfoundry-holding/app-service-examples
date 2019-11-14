@@ -2,13 +2,21 @@
 
 #### Overview ####
 
+Many IoT deployments require some form of integration with the cloud. The integration will be required for both north- and south bound integration.  For south-bound services, after analytic processing from the cloud, some device actions are notmally triggered as a result of gathered intelligence. This document demonstrates a sample EdgeX application service–HTTP Command Service that can receive commands from the Azure IoT Hub, consume the device data and invoke commands against devices. The entire technical architecture is illustrated below:
+
+![Technical Architecture](./Southbound.png)
+
 We sometimes want to trigger device actions from the cloud; that is, from the Azure IoT Hub to EdgeX. The EdgeX Core Command Service provides a comprehensive set of APIs to achieve this. However, in some cases, you might prefer not to expose all APIs and therefore require a finer-grained control over the APIs to be exposed. For example, you might want to control the commands on specific devices that can receive commands from outside of EdgeX, or to allow only certain values for a specific command.  HTTP Command Service provides a sample implementations to achieve such control.
 
 #### Prerequisites ####
 
 * Obtain the code from the https://github.com/edgexfoundry-holding/app-service-examples repo
 * Ensure that EdgeX is running with mandatory services, including core services and logging service
-* Ensure that the Virtual Device Service is running and managed by EdgeX with at least one pre-defined device, such as Random-Boolean-Device
+* Ensure that the Virtual Device Service is running and managed by EdgeX with at least one pre-defined device, such as Random-Boolean-Device<br>
+
+If you are unfamiliar with the Azure IoT Hub, read the following documents first, as this document intentionally omits some details on Azure:
+* [Create an Azure IoT Hub on the Azure portal](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal)
+* [Set up X.509 security on Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-security-x509-get-started)
 
 #### Steps ####
 
