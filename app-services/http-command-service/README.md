@@ -20,13 +20,14 @@ If you are unfamiliar with the Azure IoT Hub, read the following documents first
 
 #### Steps ####
 
-1. The HTTP Command Service exposes an HTTP service for the client to switch on / off of the device without knowing the underlying EdgeX APIs. For the service to send commands to correct device, you must set DeviceID and CommandID in the [res/configuration.toml](./res/configuration.toml) file. 
-   **Note:** For real use cases, the DeviceID must be associated with the actual device that is managed by EdgeX; the CommandID must be associated with the required command registered under the EdgeX Core Command Service, and the command must provide correct responses to consume the [switch on / off JSON document](./status-on-request.json). For simplicity, we can use the Virtual Device Service here.
+1. The HTTP Command Service exposes an HTTP service for the client to switch on / off of the device without knowing the underlying EdgeX APIs. For the service to send commands to correct device, you must set DeviceID and CommandID in the [res/configuration.toml](./res/configuration.toml) file.<br>
     ```
      [ApplicationSettings]
      DeviceID = "9f178953-84e7-49f6-9829-5b86b7cbbcda"
      CommandID = "15786a22-d89b-474b-a7de-18371c3d22c5"
-    ```
+    ``` 
+   **Note:** For real use cases, the DeviceID must be associated with the actual device that is managed by EdgeX; the CommandID must be associated with the required command registered under the EdgeX Core Command Service, and the command must provide correct responses to consume the [switch on / off JSON document](./status-on-request.json). For simplicity, we can use the Virtual Device Service in this sample.
+    
 2. Build the HTTP command service through steps as described [here](https://github.com/edgexfoundry-holding/app-service-examples#building-examples). 
 3. Run the http-command service through steps as described [here](https://github.com/edgexfoundry-holding/app-service-examples#running-an-example), and you have an HTTP service that can switch on/off your device by sending a [JSON payload](./status-on-request.json) to the http://127.0.0.1:48095/api/v1/trigger endpoint.
 4. With the HTTP Command Service ready, your Azure IoT Hub can use a direct method to control the device. Azure provides an IoT device SDK in various programming languages. Refer to [Quickstart: Control a device connected to an Azure IoT hub with Java](https://docs.microsoft.com/en-us/azure/iot-hub/quickstart-control-device-java) for more details of using the direct method.  To simplify the implementation, we supply modified code, which is ready to run with the Azure IoT hub:
