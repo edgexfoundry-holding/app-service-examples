@@ -45,7 +45,7 @@ func ConvertToReadableFloatValues(edgexcontext *appcontext.Context, params ...in
 
 		data, err := base64.StdEncoding.DecodeString(eventReading.Value)
 		if err != nil {
-			edgexcontext.LoggingClient.Error(fmt.Sprintf("Unable to Base 64 decode float32/64 value ('%s'): %s", eventReading.Value, err.Error()))
+			return false, fmt.Errorf("unable to Base 64 decode float32/64 value ('%s'): %s", eventReading.Value, err.Error())
 		}
 
 		switch eventReading.Name {
@@ -53,7 +53,7 @@ func ConvertToReadableFloatValues(edgexcontext *appcontext.Context, params ...in
 			var value float32
 			err = binary.Read(bytes.NewReader(data), binary.BigEndian, &value)
 			if err != nil {
-				edgexcontext.LoggingClient.Error("Unable to decode float32 value bytes" + err.Error())
+				return false, fmt.Errorf("unable to decode float32 value bytes: %s", err.Error())
 			}
 
 			eventReading.Value = strconv.FormatFloat(float64(value), 'f', precision, 32)
@@ -62,7 +62,7 @@ func ConvertToReadableFloatValues(edgexcontext *appcontext.Context, params ...in
 			var value float64
 			err := binary.Read(bytes.NewReader(data), binary.BigEndian, &value)
 			if err != nil {
-				edgexcontext.LoggingClient.Error("Unable to decode float64 value bytes: " + err.Error())
+				return false, fmt.Errorf("unable to decode float64 value bytes: %s", err.Error())
 			}
 
 			eventReading.Value = strconv.FormatFloat(value, 'f', precision, 64)
