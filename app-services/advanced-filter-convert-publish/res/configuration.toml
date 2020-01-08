@@ -64,5 +64,4 @@ SubscribeTopic="events"
 PublishTopic="converted"
 
 [ApplicationSettings]
-ApplicationName = "advanced-filter-convert-publish"
 ValueDescriptors = "RandomValue_Float32, RandomValue_Float64"

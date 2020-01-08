@@ -19,12 +19,11 @@ package main
 import (
 	"fmt"
 	"os"
-	"strings"
-
-	"github.com/edgexfoundry/app-functions-sdk-go/pkg/transforms"
 
 	"github.com/edgexfoundry/app-functions-sdk-go/appsdk"
-	"github.com/edgexfoundry/app-functions-sdk-go/examples/advanced-filter-convert-publish/functions"
+	"github.com/edgexfoundry/app-functions-sdk-go/pkg/transforms"
+
+	"github.com/edgexfoundry-holding/app-service-examples/app-services/advanced-filter-convert-publish/functions"
 )
 
 const (
@@ -35,40 +34,26 @@ func main() {
 	// 1) First thing to do is to create an instance of the EdgeX SDK and initialize it.
 	edgexSdk := &appsdk.AppFunctionsSDK{ServiceKey: serviceKey}
 	if err := edgexSdk.Initialize(); err != nil {
-		edgexSdk.LoggingClient.Error(fmt.Sprintf("SDK initialization failed: %v\n", err))
+		message := fmt.Sprintf("SDK initialization failed: %v\n", err)
+		if edgexSdk.LoggingClient != nil {
+			edgexSdk.LoggingClient.Error(message)
+		} else {
+			fmt.Println(message)
+		}
 		os.Exit(-1)
 	}
 
 	// 2) shows how to access the application's specific configuration settings.
-	appSettings := edgexSdk.ApplicationSettings()
-	if appSettings == nil {
-		edgexSdk.LoggingClient.Error("No application settings found")
+	valueDescriptors, err := edgexSdk.GetAppSettingStrings("ValueDescriptors")
+	if err != nil {
+		edgexSdk.LoggingClient.Error(err.Error())
 		os.Exit(-1)
 	}
+	edgexSdk.LoggingClient.Info(fmt.Sprintf("Filtering for ValueDescriptors %v", valueDescriptors))
 
-	appName, ok := appSettings["ApplicationName"]
-	if ok {
-		edgexSdk.LoggingClient.Info(fmt.Sprintf("%s now running...", appName))
-	} else {
-		edgexSdk.LoggingClient.Error("ApplicationName application setting not found")
-		os.Exit(-1)
-	}
-
-	valueDescriptorList, ok := appSettings["ValueDescriptors"]
-	if !ok {
-		edgexSdk.LoggingClient.Error("ValueDescriptors application setting not found")
-		os.Exit(-1)
-	}
-
-	// 3) Since our FilterByValueDescriptor Function requires the list of ValueDescriptor's we would
-	// like to search for, we'll go ahead create that list from the corresponding configuration setting.
-	valueDescriptorList = strings.Replace(valueDescriptorList, " ", "", -1)
-	valueDescriptors := strings.Split(valueDescriptorList, ",")
-	edgexSdk.LoggingClient.Info(fmt.Sprintf("Filtering for %v value descriptors...", valueDescriptors))
-
-	// 4) This is our functions pipeline configuration, the collection of functions to
+	// 3) This is our functions pipeline configuration, the collection of functions to
 	// execute every time an event is triggered.
-	err := edgexSdk.SetFunctionsPipeline(
+	err = edgexSdk.SetFunctionsPipeline(
 		transforms.NewFilter(valueDescriptors).FilterByValueDescriptor,
 		functions.ConvertToReadableFloatValues,
 		functions.PrintFloatValuesToConsole,
@@ -80,7 +65,7 @@ func main() {
 		os.Exit(-1)
 	}
 
-	// 5) Lastly, we'll go ahead and tell the SDK to "start" and begin listening for events
+	// 4) Lastly, we'll go ahead and tell the SDK to "start" and begin listening for events
 	// to trigger the pipeline.
 	err = edgexSdk.MakeItRun()
 	if err != nil {

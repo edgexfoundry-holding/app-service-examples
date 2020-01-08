@@ -21,8 +21,9 @@ import (
 	"os"
 
 	"github.com/edgexfoundry/app-functions-sdk-go/appsdk"
-	"github.com/edgexfoundry/app-functions-sdk-go/examples/advanced-target-type/functions"
 	"github.com/edgexfoundry/app-functions-sdk-go/pkg/transforms"
+
+	"github.com/edgexfoundry-holding/app-service-examples/app-services/advanced-target-type/functions"
 )
 
 const (
@@ -34,7 +35,12 @@ func main() {
 	//    and initialize it. Note that the TargetType is a pointer to an instance of the type.
 	edgexSdk := &appsdk.AppFunctionsSDK{ServiceKey: serviceKey, TargetType: &functions.Person{}}
 	if err := edgexSdk.Initialize(); err != nil {
-		edgexSdk.LoggingClient.Error(fmt.Sprintf("SDK initialization failed: %v\n", err))
+		message := fmt.Sprintf("SDK initialization failed: %v\n", err)
+		if edgexSdk.LoggingClient != nil {
+			edgexSdk.LoggingClient.Error(message)
+		} else {
+			fmt.Println(message)
+		}
 		os.Exit(-1)
 	}
 
