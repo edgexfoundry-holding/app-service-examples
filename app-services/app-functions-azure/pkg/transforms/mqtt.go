@@ -153,7 +153,7 @@ func LoadAzureMQTTConfig(sdk *appsdk.AppFunctionsSDK) (*AzureMQTTConfig, error) 
 
 	config.IoTHub = iotHub
 	config.IoTDevice = iotDevice
-	config.MQTTConfig = sdkTransforms.NewMqttConfig()
+	config.MQTTConfig = &sdkTransforms.MqttConfig{}
 
 	// Retrieve key/cert pair from Vault
 	pair, err := retrieveKeyCertPair(tokenPath, vaultHost, vaultPort, certPath)
@@ -189,7 +189,7 @@ func NewAzureMQTTSender(logging logger.LoggingClient, config *AzureMQTTConfig) *
 		Topic:     topic,
 	}
 
-	mqttSender := sdkTransforms.NewMQTTSender(logging, addressable, config.KeyCertPair, config.MQTTConfig)
+	mqttSender := sdkTransforms.NewMQTTSender(logging, addressable, config.KeyCertPair, *config.MQTTConfig, false)
 
 	return mqttSender
 }

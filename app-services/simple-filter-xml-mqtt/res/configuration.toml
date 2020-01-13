@@ -79,4 +79,4 @@ SubscribeTopic="events"
 PublishTopic="somewhere"
 
 [ApplicationSettings]
-ApplicationName = "simple-filter-xml-mqtt"
+DeviceNames = "Random-Float-Device"

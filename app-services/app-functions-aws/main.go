@@ -5,11 +5,12 @@ import (
 	"os"
 	"strings"
 
-	awsTransforms "github.com/edgexfoundry-holding/app-functions-aws/pkg/transforms"
 	"github.com/edgexfoundry/app-functions-sdk-go/appcontext"
 	"github.com/edgexfoundry/app-functions-sdk-go/appsdk"
 	"github.com/edgexfoundry/app-functions-sdk-go/pkg/transforms"
 	"github.com/edgexfoundry/app-functions-sdk-go/pkg/util"
+
+	awsTransforms "github.com/edgexfoundry-holding/app-service-examples/app-services/app-functions-aws/pkg/transforms"
 )
 
 const (
@@ -21,10 +22,14 @@ func main() {
 	// 1) First thing to do is to create an instance of the EdgeX SDK and initialize it.
 	edgexSdk := &appsdk.AppFunctionsSDK{ServiceKey: serviceKey}
 	if err := edgexSdk.Initialize(); err != nil {
-		edgexSdk.LoggingClient.Error(fmt.Sprintf("SDK initialization failed: %v\n", err))
+		message := fmt.Sprintf("SDK initialization failed: %v\n", err)
+		if edgexSdk.LoggingClient != nil {
+			edgexSdk.LoggingClient.Error(message)
+		} else {
+			fmt.Println(message)
+		}
 		os.Exit(-1)
 	}
-
 
 	// 2) Load AWS-specific MQTT configuration from App SDK
 	// You can also create AWSMQTTConfig struct yourself

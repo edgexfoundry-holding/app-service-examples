@@ -84,5 +84,7 @@ Type="messagebus"
 SubscribeTopic="events"
 PublishTopic="somewhere"
 
+[ApplicationSettings]
+DeviceNames = "Random-Float-Device"
 
 
