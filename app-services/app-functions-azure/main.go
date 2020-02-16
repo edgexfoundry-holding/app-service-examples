@@ -1,4 +1,4 @@
-package app_functions_azure
+package main
 
 import (
 	"fmt"
