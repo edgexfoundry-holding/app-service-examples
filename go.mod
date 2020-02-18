@@ -1,6 +1,6 @@
 module github.com/edgexfoundry-holding/app-service-examples
 
-go 1.12
+go 1.13
 
 require (
 	github.com/dghubble/sling v1.3.0
