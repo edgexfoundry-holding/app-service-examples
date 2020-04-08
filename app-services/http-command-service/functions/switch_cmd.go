@@ -74,7 +74,7 @@ func SendSwitchCommand(edgexcontext *appcontext.Context, params ...interface{}) 
 
 	edgexcontext.LoggingClient.Info("Device ID: " + deviceId)
 	edgexcontext.LoggingClient.Info("Command ID: " + commandId)
-	r, err := edgexcontext.CommandClient.Put(deviceId, commandId, cmd, ctx)
+	r, err := edgexcontext.CommandClient.Put(ctx, deviceId, commandId, cmd)
 
 	if err == nil {
 		edgexcontext.LoggingClient.Debug("Response : " + r)
