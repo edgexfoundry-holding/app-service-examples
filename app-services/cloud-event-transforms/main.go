@@ -29,6 +29,7 @@ import (
 	localtransforms "github.com/edgexfoundry-holding/app-service-examples/app-services/cloud-event-transforms/pkg/transforms"
 	"github.com/edgexfoundry/app-functions-sdk-go/appcontext"
 	"github.com/edgexfoundry/app-functions-sdk-go/appsdk"
+	"github.com/edgexfoundry/app-functions-sdk-go/pkg/transforms"
 )
 
 const (
@@ -72,6 +73,7 @@ func main() {
 	// function will simply print the original event to the console
 	edgexSdk.SetFunctionsPipeline(
 		localtransforms.NewConversion().TransformToCloudEvent,
+		transforms.NewOutputData().SetOutputData,
 		sendCloudEvents,
 		localtransforms.NewConversion().TransformFromCloudEvent,
 		printToConsole,
