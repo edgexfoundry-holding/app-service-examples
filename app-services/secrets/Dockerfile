@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-FROM golang:1.12-alpine AS builder
+FROM golang:1.13-alpine AS builder
 
 LABEL license='SPDX-License-Identifier: Apache-2.0' \
   copyright='Copyright (c) 2019: Intel'
@@ -41,6 +41,6 @@ LABEL license='SPDX-License-Identifier: Apache-2.0' \
 RUN apk --no-cache add zeromq
 
 COPY --from=builder /app-service-examples/app-services/secrets/res /res
-COPY --from=builder /app-service-examples/app-services/secrets/secrets /secrets
+COPY --from=builder /app-service-examples/app-services/secrets/app-service /secrets-example
 
-CMD [ "/secrets" ,"--registry","--confdir=/res"]
+CMD [ "/secrets-example","--registry","--confdir=/res","-cp=consul.http://edgex-core-consul:8500"]

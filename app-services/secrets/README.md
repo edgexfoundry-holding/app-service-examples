@@ -1,36 +1,108 @@
 # Secrets example
 
-#### Overview
-
 This example demonstrates storing a secret to the secret store (Vault) and retrieving those secrets.
 
-When running an application service in secure mode, secrets can be stored by making an HTTP `POST` call to `http://[host]:[port]/api/v1/secrets`.  If running in insecure mode, secrets can be configured in consul or in the config yaml file.
+If in secure mode, the secrets are stored and retrieved from Vault based on the *SecretStoreExclusive* section of the configuration file.
 
-Application Services can retrieve their secrets from the underlying secret store using the GetSecrets() API in the SDK. 
+Please refer to the [Application Functions SDK documentation](https://github.com/edgexfoundry/app-functions-sdk-go#secrets)  for more details on storing and getting secrets using the SDK.
 
-`.GetSecrets(path string, keys ...string)` is used to retrieve secrets from the secret store. `path` describes the type or location of the secrets to retrieve. If specified it is appended to the base path from the secret store configuration. `keys` specifies the secrets which to retrieve. If no keys are provided then all the keys associated with the specified path will be returned.
+## Run the app within EdgeX docker
 
-#### Secure mode
+**Steps:**
 
-If in secure mode, the secrets are stored and retrieved from Vault based on the SecretStore configuration values.
+1. From the app-service-examples root folder, build the docker image for the secrets example service.
 
-Setup the application config to use  Vault's secrets engine:
+   ```
+   make docker_secrets_example
+   ```
+
+2. Add the environment variable `ADD_SECRETSTORE_TOKENS` to the vault-worker service in your EdgeX docker compose file. It takes a list of service keys that it generates Vault tokens for. This is used as the base path for the service's secrets in Vault.  `secrets-example` is the application service that we will be running.
+
+   ```yml
+   environment:
+         - "SECRETSTORE_SETUP_DONE_FLAG=/tmp/edgex/secrets/edgex-consul/.secretstore-setup-done"
+         - "ADD_SECRETSTORE_TOKENS=secrets-example"
+       
+   ```
+
+3. The default configuration is for running natively and we use environment overrides in the compose files for use in docker.
+
+4. Add the secrets example application service to your EdgeX docker compose file. This includes the environment overrides for the SecretStore and SecretStoreExclusive configurations:
+
+   ```yml
+     app-service-secrets-example:
+       image: edgexfoundry/docker-secrets-example:dev
+       container_name: app-service-secrets-example
+       hostname: app-service-secrets-example
+       ports:
+         - "48095:48095"
+       networks:
+         - edgex-network
+       environment:
+         <<: *common-variables
+         SecretStore_Protocol: https
+         SecretStore_TokenFile: /tmp/edgex/secrets/edgex-application-service/secrets-token.json
+         SecretStoreExclusive_Host: edgex-vault
+         SecretStoreExclusive_Protocol: https
+         SecretStoreExclusive_RootCaCertPath: /tmp/edgex/secrets/ca/ca.pem
+         SecretStoreExclusive_ServerName: edgex-vault
+         SecretStoreExclusive_TokenFile: /tmp/edgex/secrets/secrets-example/secrets-token.json
+       volumes:
+         - /tmp/edgex/secrets/ca:/tmp/edgex/secrets/ca:ro,z
+         - /tmp/edgex/secrets/edgex-application-service:/tmp/edgex/secrets/edgex-application-service:ro,z 
+         - /tmp/edgex/secrets/secrets-example:/tmp/edgex/secrets/secrets-example:ro,z 
+       depends_on:
+         - vault-worker
+         - data
+```
+   
+4. Run EdgeX security services in docker to generate a Vault token for our app service:
+   
+   1. Run the secret store services in EdgeX using:
+   
+      `docker-compose -f <docker-compose file name> up -d vault-worker`
+   
+      Verify that the following services are running:
+   
+      ```
+      edgex-secrets-setup
+         edgex-vault
+         edgex-vault-worker
+         ```
+         
+      2. Wait for about a minute to ensure tokens are created for the services that were specified in the docker compose section of vault-worker service for `ADD_SECRETSTORE_TOKENS` environment variable. Verify that the token `secrets-example` exist under `/tmp/edgex/secrets`.
+      
+5. Run the secrets example service:
+   
+   ```
+      docker-compose -f <docker-compose file name> up -d app-service-secrets-example
+   ```
+   
+      Check the app's logs to make sure no errors occurred during startup:
+   
+   ```
+      docker logs app-service-secrets-example
+   ```
+   
+   6. Follow the instructions in [Storing and Getting Secrets](#storing-and-getting-secrets) in order to test storing and retrieving secrets from the secret store.
+
+## Run the app natively (for dev/debug)
+
+The default configuration settings are used for running natively. The application service is already configured for running Vault in dev-mode (with http).  We need to run Vault, enable its secrets engine, then run our service. 
 
 1. Run vault using the docker compose file in this directory. 
 
-   ` docker-compose -f docker-compose.yml up`
+   ` docker-compose -f docker-compose.yml up -d`
 
-2. If running this example natively (not in docker), then you will need to manually set the current Vault token in configuration.
+2. You will need to manually set the current Vault token in configuration.
 
    1. Find the root token for Vault in the logs of the container:
 
-      `docker logs <container-id>
+      `docker logs <container-id>`
 
    ![image-20200224130525112](./root-token.png)
 
-   2. Copy the token to the *'root_token'* field in the token file (*token.json*). 
-   3. Change the *SecretStore.Tokenfile* section of the configuration toml to point to the token file.
-   4. Copy the token to the *SecretStore.Authentication.AuthToken* section of the configuration.
+   2. Copy the token to the *'root_token'* field in the token file (./res/*token.json*). Verify that `SecretStore.TokenFile` and  `SecretStoreExclusive.TokenFile` are already configured with ./res/*token.json* as the token file path.
 
 3. Use docker exec to run commands on the running vault container instance.
 
@@ -48,49 +120,23 @@ Success! Disabled the secrets engine (if it existed) at: secret/
 Success! Enabled the kv secrets engine at: secret/
 ```
 
-#### Insecure mode
+5. Run the secrets service: `go run main.go`
+6. Follow the instructions in [Storing and Getting Secrets](#storing-and-getting-secrets) in order to test storing and retrieving secrets from the secret store.
 
-When security is disabled, the secrets can be written to and are retrieved from the *Writable.InsecureSecrets* section of the configuration file. Insecure secrets and their paths can be configured as below.
+## Storing and Getting Secrets
 
-```toml
- [Writable.InsecureSecrets]    
-      [Writable.InsecureSecrets.NoPath]
-        Path = ''
-        [Writable.InsecureSecrets.NoPath.Secrets]
-          username = 'nopath-user'
-          password = 'nopath-pw'
-      
-      [Writable.InsecureSecrets.AWS]
-        Path = 'aws'
-        [Writable.InsecureSecrets.AWS.Secrets]
-          username = 'aws-user'
-          password = 'aws-pw'
-      
-      [Writable.InsecureSecrets.MongoDB]
-        Path = 'mongodb'
-        [Writable.InsecureSecrets.MongoDB.Secrets]
-          username = ''
-          password = ''
-```
+These tests use a collection of Postman requests, in *SecretsExample.postman_collection.json*, to store and retrieve secrets from the secret store.
 
-`NOTE: An empty path is a valid configuration for a secret's location  `
+1. Import the collection *SecretsExample.postman_collection.json* into Postman.
 
-#### Run StoreSecrets and GetSecrets
+2. Execute the `Store Secrets` request in the Postman collection to push secrets to Vault. This is going through the App Service REST API, not directly to Vault. As such, the secret is exclusively for that app service instance.
 
-##### StoreSecrets
+3. Execute the `Get Secrets with App Service HTTP` request in the Postman collection.
 
-When running in secure mode, secrets for can be stored in the secret store (Vault) by making an HTTP `POST` call to `http://[host]:[port]/api/v1/secrets`.  
+   This request triggers an EdgeX event to the application service which causes execution of the pipeline function that calls the GetSecrets API.  As a result, the app service will get the exclusive secrets that were just pushed.
 
-*SecretsExample.postman_collection.json* contains Postman requests to store secrets to using the */secrets* API route. 
+4. View the service's logs to verify that the secrets were retrieved. We'll view the secrets in the application's console (in production, NEVER log your application's secrets. This is done in the example service to demonstrate the functionality).
 
-If in secure mode, execute the Store Secrets Postman requests to push secrets to Vault.
+   1. Running in docker: `docker logs app-service-secrets-example`
+   2. Running natively: view the console
 
-If running in insecure mode, configure the secrets in consul or in the config yaml file (as described [above](#Insecure mode)).
-
-##### GetSecrets
-
-*SecretsExample.postman_collection.json* contains a Postman request to get secrets by triggering a CoreData event to the application service. 
-
-Execute the *CoreData Event Trigger (Random-Float-Device)* request and view the secrets in the application's console.
-
-This trigger causes execution of the pipeline function that uses the SecretClient to get secrets.

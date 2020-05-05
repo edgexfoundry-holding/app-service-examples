@@ -19,13 +19,13 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/edgexfoundry/app-functions-sdk-go/appcontext"
+	"github.com/edgexfoundry-holding/app-service-examples/app-services/secrets/functions"
 	"github.com/edgexfoundry/app-functions-sdk-go/appsdk"
 	"github.com/edgexfoundry/app-functions-sdk-go/pkg/transforms"
 )
 
 const (
-	serviceKey = "secrets"
+	serviceKey = "secrets-example"
 )
 
 var counter int
@@ -57,7 +57,7 @@ func main() {
 	edgexSdk.SetFunctionsPipeline(
 		transforms.NewFilter(deviceNames).FilterByDeviceName,
 		transforms.NewConversion().TransformToXML,
-		getSecretsToConsole,
+		functions.GetSecretsToConsole,
 	)
 
 	// 4) Lastly, we'll go ahead and tell the SDK to "start" and begin listening for events
@@ -71,28 +71,4 @@ func main() {
 	// Do any required cleanup here
 
 	os.Exit(0)
-}
-
-func getSecretsToConsole(edgexcontext *appcontext.Context, params ...interface{}) (bool, interface{}) {
-	if len(params) < 1 {
-		// We didn't receive a result
-		return false, nil
-	}
-
-	var err error
-
-	err = getSecrets(edgexcontext, secureSecretsData, true)
-	if err != nil {
-		edgexcontext.LoggingClient.Error(err.Error())
-		return false, nil
-	}
-
-	err = getSecrets(edgexcontext, insecureSecretsData, false)
-	if err != nil {
-		edgexcontext.LoggingClient.Error(err.Error())
-		return false, nil
-	}
-
-	edgexcontext.Complete([]byte(params[0].(string)))
-	return false, nil
 }
