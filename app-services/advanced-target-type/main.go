@@ -35,12 +35,7 @@ func main() {
 	//    and initialize it. Note that the TargetType is a pointer to an instance of the type.
 	edgexSdk := &appsdk.AppFunctionsSDK{ServiceKey: serviceKey, TargetType: &functions.Person{}}
 	if err := edgexSdk.Initialize(); err != nil {
-		message := fmt.Sprintf("SDK initialization failed: %v\n", err)
-		if edgexSdk.LoggingClient != nil {
-			edgexSdk.LoggingClient.Error(message)
-		} else {
-			fmt.Println(message)
-		}
+		edgexSdk.LoggingClient.Error(fmt.Sprintf("SDK initialization failed: %v\n", err))
 		os.Exit(-1)
 	}
 

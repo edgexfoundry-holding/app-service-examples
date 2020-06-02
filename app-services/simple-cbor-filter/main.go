@@ -20,7 +20,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/edgexfoundry/app-functions-sdk-go/pkg/transforms"
 	"image"
 	_ "image/jpeg"
 	_ "image/png"
@@ -30,6 +29,7 @@ import (
 
 	"github.com/edgexfoundry/app-functions-sdk-go/appcontext"
 	"github.com/edgexfoundry/app-functions-sdk-go/appsdk"
+	"github.com/edgexfoundry/app-functions-sdk-go/pkg/transforms"
 )
 
 const (
@@ -42,12 +42,7 @@ func main() {
 	// 1) First thing to do is to create an instance of the EdgeX SDK and initialize it.
 	edgexSdk := &appsdk.AppFunctionsSDK{ServiceKey: serviceKey}
 	if err := edgexSdk.Initialize(); err != nil {
-		message := fmt.Sprintf("SDK initialization failed: %v\n", err)
-		if edgexSdk.LoggingClient != nil {
-			edgexSdk.LoggingClient.Error(message)
-		} else {
-			fmt.Println(message)
-		}
+		edgexSdk.LoggingClient.Error(fmt.Sprintf("SDK initialization failed: %v\n", err))
 		os.Exit(-1)
 	}
 
