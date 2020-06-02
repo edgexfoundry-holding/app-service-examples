@@ -22,7 +22,6 @@ Please refer to the [Application Functions SDK documentation](https://github.com
    environment:
          - "SECRETSTORE_SETUP_DONE_FLAG=/tmp/edgex/secrets/edgex-consul/.secretstore-setup-done"
          - "ADD_SECRETSTORE_TOKENS=secrets-example"
-       
    ```
 
 3. The default configuration is for running natively and we use environment overrides in the compose files for use in docker.
@@ -54,37 +53,32 @@ Please refer to the [Application Functions SDK documentation](https://github.com
        depends_on:
          - vault-worker
          - data
-```
-   
-4. Run EdgeX security services in docker to generate a Vault token for our app service:
-   
+   ```  
+
+5. Run EdgeX security services in docker to generate a Vault token for our app service:
+
    1. Run the secret store services in EdgeX using:
-   
+
       `docker-compose -f <docker-compose file name> up -d vault-worker`
-   
+
       Verify that the following services are running:
-   
+         - edgex-secrets-setup
+         - edgex-vault
+         - edgex-vault-worker
+   2. Wait for about a minute to ensure tokens are created for the services that were specified in the docker compose section of vault-worker service for `ADD_SECRETSTORE_TOKENS` environment variable. Verify that the token `secrets-example` exist under `/tmp/edgex/secrets`.
+
+5. Run the secrets example service:  
       ```
-      edgex-secrets-setup
-         edgex-vault
-         edgex-vault-worker
-         ```
-         
-      2. Wait for about a minute to ensure tokens are created for the services that were specified in the docker compose section of vault-worker service for `ADD_SECRETSTORE_TOKENS` environment variable. Verify that the token `secrets-example` exist under `/tmp/edgex/secrets`.
-      
-5. Run the secrets example service:
-   
-   ```
       docker-compose -f <docker-compose file name> up -d app-service-secrets-example
-   ```
-   
+      ```
+
       Check the app's logs to make sure no errors occurred during startup:
    
-   ```
+      ```
       docker logs app-service-secrets-example
-   ```
+      ```
    
-   6. Follow the instructions in [Storing and Getting Secrets](#storing-and-getting-secrets) in order to test storing and retrieving secrets from the secret store.
+6. Follow the instructions in [Storing and Getting Secrets](#storing-and-getting-secrets) in order to test storing and retrieving secrets from the secret store.
 
 ## Run the app natively (for dev/debug)
 
@@ -92,17 +86,17 @@ The default configuration settings are used for running natively. The applicatio
 
 1. Run vault using the docker compose file in this directory. 
 
-   ` docker-compose -f docker-compose.yml up -d`
+   `docker-compose -f docker-compose.yml up -d`
 
 2. You will need to manually set the current Vault token in configuration.
 
-   1. Find the root token for Vault in the logs of the container:
+   - Find the root token for Vault in the logs of the container:
 
-      `docker logs <container-id>`
+     `docker logs <container-id>`
 
    ![image-20200224130525112](./root-token.png)
 
-   2. Copy the token to the *'root_token'* field in the token file (./res/*token.json*). Verify that `SecretStore.TokenFile` and  `SecretStoreExclusive.TokenFile` are already configured with ./res/*token.json* as the token file path.
+   - Copy the token to the *'root_token'* field in the token file (./res/*token.json*). Verify that `SecretStore.TokenFile` and  `SecretStoreExclusive.TokenFile` are already configured with ./res/*token.json* as the token file path.
 
 3. Use docker exec to run commands on the running vault container instance.
 
@@ -112,13 +106,13 @@ The default configuration settings are used for running natively. The applicatio
 
    *Login into vault with the root token.*
 
-```
-/ # vault login
-/ # vault secrets disable secret
-Success! Disabled the secrets engine (if it existed) at: secret/
-/ # vault secrets enable -version=1 -path=secret kv
-Success! Enabled the kv secrets engine at: secret/
-```
+   ```
+   / # vault login
+   / # vault secrets disable secret
+   Success! Disabled the secrets engine (if it existed) at: secret/
+   / # vault secrets enable -version=1 -path=secret kv
+   Success! Enabled the kv secrets engine at: secret/
+   ```
 
 5. Run the secrets service: `go run main.go`
 6. Follow the instructions in [Storing and Getting Secrets](#storing-and-getting-secrets) in order to test storing and retrieving secrets from the secret store.
@@ -139,4 +133,3 @@ These tests use a collection of Postman requests, in *SecretsExample.postman_col
 
    1. Running in docker: `docker logs app-service-secrets-example`
    2. Running natively: view the console
-
