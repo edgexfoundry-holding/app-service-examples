@@ -44,12 +44,7 @@ func main() {
 	defer resetSecureStoreEnv(edgexSdk, original)
 
 	if err := edgexSdk.Initialize(); err != nil {
-		message := fmt.Sprintf("SDK initialization failed: %v", err)
-		if edgexSdk.LoggingClient != nil {
-			edgexSdk.LoggingClient.Error(message)
-		} else {
-			edgexSdk.LoggingClient.Info(message)
-		}
+		edgexSdk.LoggingClient.Error(fmt.Sprintf("SDK initialization failed: %v\n", err))
 		os.Exit(-1)
 	}
 
