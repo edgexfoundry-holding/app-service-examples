@@ -27,9 +27,9 @@ File = './logs/simple-filter-xml-mqtt.log'
 
 # Database is require when Store and Forward is enabled
 [Database]
-Type = "mongodb"
+Type = "redisdb"
 Host = "localhost"
-Port = 27017
+Port = 6379
 Timeout = "30s"
 Username = ""
 Password = ""

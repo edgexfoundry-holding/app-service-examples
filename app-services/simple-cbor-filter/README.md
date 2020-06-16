@@ -1,6 +1,6 @@
-# Simple CBOR Filter Application Service 
+# Simple CBOR Filter Application Service
 
-This **simple-cbor-filter** Application Service demonstrates end to end `CBOR` integration. It depends on the **device-simple** example device service from **Device SDK Go** to generate `CBOR` encode events. 
+This **simple-cbor-filter** Application Service demonstrates end to end `CBOR` integration. It depends on the **device-simple** example device service from **Device SDK Go** to generate `CBOR` encode events.
 
 This **simple-cbor-filter** Application Service uses two application functions:
 
@@ -11,19 +11,19 @@ The end result from this application service is that it shows that the Applicati
 
 #### Follow these steps to run the end to end CBOR demonstration
 
-1. Start EdgeX Mongo
+1. Start EdgeX Redis
 
    - [ ] clone **[developer-scripts](https://github.com/edgexfoundry/developer-scripts)** repo
    - [ ] cd **compose-files** folder
-   - [ ] run "**docker-compose up mongo**"
-     - This uses the default compose file to start the EdgeX Mongo service which exposes it's port to apps running on localhost
+   - [ ] run "**docker-compose up redis**"
+     - This uses the default compose file to start the EdgeX Redis service which exposes its port to apps running on localhost
 
 2. Run EdgeX cores services
 
    - [ ] Clone **[edgex-go](https://github.com/edgexfoundry/edgex-go)** repo
    - [ ] run "**make build**"
    - [ ] run "**make run**"
-     - This starts all the required EdgeX services 
+     - This starts all the required EdgeX services
 
 3. Run **simple-cbor-filter** example
 
@@ -42,7 +42,7 @@ The end result from this application service is that it shows that the Applicati
 
    - [ ] run "./**device-simple**"
 
-     This sample device service will send a `png` (light bulb on) or `jpeg` (light bulb off) image every 30 seconds. The image it sends depends on the value of its `switch` resource, which is `off` (false) by default.  
+     This sample device service will send a `png` (light bulb on) or `jpeg` (light bulb off) image every 30 seconds. The image it sends depends on the value of its `switch` resource, which is `off` (false) by default.
 
 5. Now data will be flowing due to auto-events configured in **device-simple**.
 
@@ -60,15 +60,15 @@ The end result from this application service is that it shows that the Applicati
 
      2. Load the postman collection from the **simple-cbor-filter** example
 
-        `Device Simple Switch commands.postman_collection.json`  
+        `Device Simple Switch commands.postman_collection.json`
 
-     3. This collection contains 3 commands 
+     3. This collection contains 3 commands
 
         - `Get Switch status`
         - `Turn Switch on`
         - `Turn Switch off`
 
-     4. Run  `Turn Switch on` 
+     4. Run  `Turn Switch on`
 
    -  Now see how the **simple-cbor-filter** output has changed
 
@@ -76,4 +76,4 @@ The end result from this application service is that it shows that the Applicati
          Received Image from Device: Simple-Device01, ReadingName: Image, Image Type: png, Image Size: (1000,1307), Color in middle: {255 246 0 255}
          ```
 
-   
+

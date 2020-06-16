@@ -26,9 +26,9 @@ EnableRemote = false
 File = './logs/simple-filter-xml-mqtt.log'
 
 [Database]
-Type = "mongodb"
+Type = "redisdb"
 Host = "localhost"
-Port = 27017
+Port = 6379
 Timeout = "30s"
 Username = ""
 Password = ""
