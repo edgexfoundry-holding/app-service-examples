@@ -40,6 +40,9 @@ LABEL license='SPDX-License-Identifier: Apache-2.0' \
 
 RUN apk --no-cache add zeromq
 
+# Turn off secure mode for examples. Not recommended for production
+ENV EDGEX_SECURITY_SECRET_STORE=false
+
 COPY --from=builder /app-service-examples/app-services/simple-filter-xml/res /res
 COPY --from=builder /app-service-examples/app-services/simple-filter-xml/app-service /simple-filter-xml
 

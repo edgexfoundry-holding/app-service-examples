@@ -31,6 +31,8 @@ const (
 )
 
 func main() {
+	// turn off secure mode for examples. Not recommended for production
+	os.Setenv("EDGEX_SECURITY_SECRET_STORE", "false")
 	// 1) First thing to do is to create an instance of the EdgeX SDK with your TargetType set
 	//    and initialize it. Note that the TargetType is a pointer to an instance of the type.
 	edgexSdk := &appsdk.AppFunctionsSDK{ServiceKey: serviceKey, TargetType: &functions.Person{}}
