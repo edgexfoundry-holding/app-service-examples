@@ -18,6 +18,8 @@ const (
 var counter int
 
 func main() {
+	// turn off secure mode for examples. Not recommended for production
+	os.Setenv("EDGEX_SECURITY_SECRET_STORE", "false")
 	// 1) First thing to do is to create an instance of the EdgeX SDK and initialize it.
 	edgexSdk := &appsdk.AppFunctionsSDK{ServiceKey: serviceKey}
 	if err := edgexSdk.Initialize(); err != nil {

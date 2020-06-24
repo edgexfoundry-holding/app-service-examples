@@ -37,6 +37,8 @@ const (
 )
 
 func main() {
+	// turn off secure mode for examples. Not recommended for production
+	os.Setenv("EDGEX_SECURITY_SECRET_STORE", "false")
 	// First thing to do is to create an instance of the EdgeX SDK and initialize it.
 	edgexSdk := &appsdk.AppFunctionsSDK{ServiceKey: serviceKey}
 
@@ -136,7 +138,8 @@ func printToConsole(edgexcontext *appcontext.Context, params ...interface{}) (bo
 // helper function to disable security
 func disableSecureStore() (origEnv string, err error) {
 	origEnv = os.Getenv("EDGEX_SECURITY_SECRET_STORE")
-	err = os.Setenv("EDGEX_SECURITY_SECRET_STORE", "false")
+	err = // turn off secure mode for examples. Not recommended for production
+		os.Setenv("EDGEX_SECURITY_SECRET_STORE", "false")
 	return origEnv, err
 }
 
