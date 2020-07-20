@@ -33,6 +33,7 @@ BootTimeout = 30000
 ClientMonitor = 15000
 CheckInterval = "10s"
 Host = "app-service-configurable-mqtt-export"
+ServerBindAddr = "" # if blank, uses default Go behavior https://golang.org/pkg/net/#Listen
 Port = 48095
 Protocol = "http"
 ReadMaxLimit = 100
